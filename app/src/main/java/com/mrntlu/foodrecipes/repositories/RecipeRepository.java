@@ -38,7 +38,7 @@ public class RecipeRepository {
             public void onChanged(List<Recipe> recipes) {
                 if (recipes!=null){
                     mRecipes.setValue(recipes);
-
+                    doneQuery(recipes);
                 }else{
                     //search db cache
                     doneQuery(null);
@@ -47,30 +47,31 @@ public class RecipeRepository {
         });
     }
 
-    public void doneQuery(List<Recipe> list){
+    private void doneQuery(List<Recipe> list){
         if (list!=null){
             if (list.size()%30!=0){
                 mIsQueryExhausted.setValue(true);
             }
-        }else{
+        }
+        else{
             mIsQueryExhausted.setValue(true);
         }
-    }
-
-    public LiveData<List<Recipe>> getRecipes(){
-        return mRecipes;
     }
 
     public LiveData<Boolean> isQueryExhausted(){
         return mIsQueryExhausted;
     }
 
+    public LiveData<List<Recipe>> getRecipes(){
+        return mRecipes;
+    }
+
     public LiveData<Recipe> getRecipe(){
         return mRecipeApiClient.getRecipe();
     }
 
-    public LiveData<Boolean> isRecipeRequestTimedOut(){
-        return mRecipeApiClient.isRecipeRequestTimedOut();
+    public void searchRecipeById(String recipeId){
+        mRecipeApiClient.searchRecipeById(recipeId);
     }
 
     public void searchRecipesApi(String query,int pageNumber){
@@ -83,15 +84,15 @@ public class RecipeRepository {
         mRecipeApiClient.searchRecipesApi(query,pageNumber);
     }
 
-    public void searchRecipeById(String recipeId){
-        mRecipeApiClient.searchRecipeById(recipeId);
-    }
-
     public void searchNextPage(){
         searchRecipesApi(mQuery,mPageNumber+1);
     }
 
     public void cancelRequest(){
         mRecipeApiClient.cancelRequest();
+    }
+
+    public LiveData<Boolean> isRecipeRequestTimedOut(){
+        return mRecipeApiClient.isRecipeRequestTimedOut();
     }
 }
